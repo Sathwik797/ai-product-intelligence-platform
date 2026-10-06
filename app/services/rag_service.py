@@ -178,10 +178,10 @@ class RAGService:
                     final_claims = resp2.claims
                     attempt2_success = True
                 else:
-                    fallback_reason = f"Validation failed after retry: {'; '.join(val_result2.errors[:3])}"
+                    fallback_reason = "Model output failed verification after retry."
             except RAGProviderError as pe2:
                 logger.warning(f"RAG LLM provider error on Attempt 2 retry: {pe2}")
-                fallback_reason = f"Provider error during retry: {pe2}"
+                fallback_reason = "RAG provider failed during retry."
 
             # 5. Fail Closed Fallback (Q74)
             if not attempt2_success:
