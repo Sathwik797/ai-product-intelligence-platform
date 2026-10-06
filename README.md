@@ -8,7 +8,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat)](LICENSE)
 
-An enterprise-grade, multimodal backend platform engineered to automate e-commerce catalog intelligence. Built with **FastAPI**, **SQLAlchemy ORM**, **Pydantic V2**, and the official **Google GenAI SDK**, the system transforms raw product assets into verified, structured catalog metadata through strict multimodal AI extraction, anti-hallucination guardrails, and a human-in-the-loop review boundary.
+A production-oriented, multimodal backend platform engineered to automate e-commerce catalog intelligence. Built with **FastAPI**, **SQLAlchemy ORM**, **Pydantic V2**, and the official **Google GenAI SDK**, the system transforms raw product assets into verified, structured catalog metadata through strict multimodal AI extraction, anti-hallucination guardrails, and a human-in-the-loop review boundary.
 
 ---
 
@@ -141,7 +141,7 @@ Category (categories)
 - Ensemble product image storage with MIME-type verification, dimension calculation, and display-order sequencing.
 - Multi-image aggregation: all uploaded product assets are analyzed concurrently to provide 360-degree context to the vision model.
 
-### 3. Multimodal Vision Intelligence Engine (Gemini 2.5 Flash)
+### 3. Multimodal Vision Intelligence Engine (Gemini 3.1 Flash-Lite by default)
 - Powered by the modern `google-genai` SDK (`genai.Client`).
 - Multi-image ensemble prompt engineering with zero-shot domain context injection.
 - **Anti-Hallucination Contract**: Mandatory structured evidence citations (`image_id`, `seller`, or `inferred`) and bounded confidence scoring `[0.0, 1.0]`.
@@ -172,9 +172,9 @@ Category (categories)
 | **Data Validation** | Pydantic V2 | High-speed C-based validation (`pydantic-core`) with discriminated unions. |
 | **Persistence / ORM** | SQLAlchemy 2.0 | Explicit transactions, unit-of-work pattern, declarative mapping. |
 | **Database Migrations** | Alembic 1.20+ | Version-controlled, reproducible relational schema migrations. |
-| **Database Engine** | MySQL 8.0+ / PyMySQL | Production enterprise RDBMS; SQLite static pool for in-memory unit tests. |
+| **Database Engine** | MySQL 8.0+ / PyMySQL with SQLite fallback | MySQL is the primary deployment database; SQLite is used as a zero-config local/test fallback. |
 | **Vector Engine** | FAISS (`faiss-cpu`) | In-memory dense vector indexing (`IndexIDMap2` + `IndexFlatIP`) with cosine normalization. |
-| **AI Models** | Google Gemini 2.5 Flash / `gemini-embedding-001` | Multimodal visual reasoning and 768-dimensional dense vector embeddings. |
+| **AI Models** | Google Gemini 3.1 Flash-Lite / `gemini-embedding-001` | Configurable multimodal visual reasoning and 768-dimensional dense vector embeddings. |
 | **AI SDK** | `google-genai` (v2.22.0) | Official modern Google GenAI client library. |
 | **Image Processing** | Pillow (PIL) | Automated dimension extraction and image format verification. |
 | **Server Engine** | Uvicorn | Production-ready ASGI server implementation. |
@@ -400,7 +400,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 ## 🧪 Test Coverage & Verification
 
-The platform maintains an extensive automated regression test suite with 100% pass rates across all functional units:
+The repository documents **121 automated tests** covering the Phase 05 AI-generation and Phase 06 embedding/vector-store suites. The 121-test figure is a repository-reported result; it has not been re-executed as part of this audit.
 
 ```bash
 # Run Phase 06 Embedding & Vector Store Suites
@@ -420,7 +420,7 @@ python scratch/test_ai_generation_api.py
 python scratch/test_ai_acceptance.py
 ```
 
-### Test Suite Summary
+### Repository-Reported Test Suite Summary
 | Suite | Target Layer | Tests | Status |
 |---|---|---|---|
 | `test_embedding_text_builder.py` | Deterministic ordering, collection normalization, L×W×H dimensions, SHA-256 | 4 | ✅ PASS |
@@ -435,7 +435,7 @@ python scratch/test_ai_acceptance.py
 | `test_ai_generation_service.py` | Monotonic numbering, lifecycle state machine, rollback safety | 18 | ✅ PASS |
 | `test_ai_generation_api.py` | Async BackgroundTasks, SessionLocal isolation, REST routes | 12 | ✅ PASS |
 | `test_ai_acceptance.py` | Accept-all, field-level review, seller edit sync, immutability | 14 | ✅ PASS |
-| **Total Automated Tests** | | **121** | **✅ 100% PASS** |
+| **Total Automated Tests (Phase 05/06)** | | **121** | **Repository-reported 100% PASS** |
 
 ---
 
@@ -461,9 +461,10 @@ python scratch/test_ai_acceptance.py
   - [x] Step 5: `EmbeddingService` with lifecycle management (`PENDING`, `GENERATING`, `READY`, `STALE`, `FAILED`), content-hash concurrency gate, and reconciliation.
   - [x] Step 6: Invalidation hooks on semantic catalog/AI review changes; price-only neutrality.
   - [x] Step 7: Explicit batch backfill CLI (`python -m app.commands.backfill_embeddings`).
-- [ ] **Phase 07 — Semantic Search with FAISS**: In-memory dense vector indexing and similarity retrieval.
-- [ ] **Phase 08 — Retrieval-Augmented Generation (RAG)**: Context-grounded conversational product assistant.
-- [ ] **Phase 09 — Enterprise Deployment & Observability**: Docker containerization, CI/CD, and metrics.
+- [x] **Phase 07 — Semantic Search with FAISS**: Hybrid MySQL + FAISS candidate retrieval, eligibility filtering, ranking, and bounded K expansion.
+- [x] **Phase 07.2 — Retrieval-Augmented Generation (RAG)**: Grounded product-query endpoint with typed responses.
+- [x] **Phase 08 — Product Recommendations**: Hybrid recommendation endpoint with normalized scoring and match reasons.
+- [ ] **Phase 09 — Enterprise Deployment & Observability**: Docker/containerization, CI/CD, and production metrics.
 
 ---
 
