@@ -98,10 +98,11 @@ def trigger_ai_generation(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to initiate AI generation for product %s", product_id)
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to initiate generation: {e}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to initiate AI generation."
         )
 
     # Schedule background processing with the exact created generation_id
@@ -169,10 +170,11 @@ def get_current_ai_generation(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to retrieve current generation for product %s", product_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve current generation: {e}"
+            detail="Failed to retrieve current generation."
         )
 
     return AIGenerationStatusResponse(
@@ -213,10 +215,11 @@ def accept_all_ai_metadata(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to accept AI metadata for product %s", product_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to accept AI metadata: {e}"
+            detail="Failed to accept AI metadata."
         )
 
 
@@ -249,9 +252,10 @@ def review_ai_metadata(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to apply AI metadata review for product %s", product_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to apply AI metadata review: {e}"
+            detail="Failed to apply AI metadata review."
         )
 
