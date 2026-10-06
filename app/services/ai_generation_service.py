@@ -223,7 +223,8 @@ class AIGenerationService:
             generation.status = "failed"
             generation.completed_at = datetime.now(timezone.utc)
             generation.processing_time = processing_time
-            generation.error_message = str(exc)
+            generation.error_message = "AI generation failed. See server logs for diagnostic details."
+            logger.error("AI generation failed for generation %s: %s", generation.id, exc, exc_info=True)
 
             # Persist failure status; DO NOT update ProductMetadata.current_generation_id
             try:
